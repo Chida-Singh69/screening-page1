@@ -193,10 +193,7 @@ const App = () => {
                 alt="Giftolexia Logo"
                 className="logo-image"
               />
-              <div>
-                <h1>Giftolexia</h1>
-                <p className="tagline">Early Screening Assessment</p>
-              </div>
+            
             </div>
 
             <div className="header-right">
@@ -249,35 +246,6 @@ const App = () => {
 
         {/* Main Content */}
         <div className="main-content">
-          {/* Developer Navigation - Remove in production */}
-          {/* <div className="dev-navigation">
-            <p>Developer Navigation (Remove in production)</p>
-            <div className="dev-nav-buttons">
-              <button 
-                className={`btn ${currentStep === 1 ? 'btn-primary' : 'btn-secondary'}`}
-                onClick={() => setCurrentStep(1)}
-              >
-                Step 1: Contact Form
-              </button>
-              <button 
-                className={`btn ${currentStep === 2 ? 'btn-primary' : 'btn-secondary'}`}
-                onClick={() => {
-                  setCurrentStep(2);
-                  // Mock some questions for testing if none exist
-                  if (questions.length === 0) {
-                    setQuestions([
-                      "Does your child have difficulty remembering names?",
-                      "Does your child confuse similar looking letters?",
-                      "Does your child have trouble with rhyming words?"
-                    ]);
-                  }
-                }}
-              >
-                Step 2: Questionnaire
-              </button>
-            </div>
-          </div> */}
-
           {error && (
             <div className="error-message">
               {error}
@@ -304,7 +272,7 @@ const App = () => {
             />
           )}
         </div>
-      </div>npm
+      </div>
     </div>
   );
 };
@@ -321,7 +289,7 @@ const ContactForm = ({ formData, updateFormData, onNext, languageMap }) => {
           going age. This results in a substantial gap between a child’s
           potential and academic performance. Early identification and right
           remediation are crucial for the academic success of these children.
-         
+          
         </p>
       </div>
 
@@ -454,11 +422,12 @@ const QuestionnairePage = ({
     }, 0);
   };
 
-  if (loading) {
+  if (loading && questions.length === 0) {
     return (
       <div className="questionnaire-container">
-        <div className="loading-message">
-          <div>Please wait</div>
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p className="loading-text-primary">Loading Questions...</p>
         </div>
       </div>
     );
@@ -469,59 +438,63 @@ const QuestionnairePage = ({
       <div className="questionnaire-header">
         <h2>Early Screening Checklist</h2>
         <p className="questionnaire-subtitle">
-          Some general indications are listed below .Please answer all the
-          questions. Choose the option that best describes your child&#39;s
+          Some general indications are listed below. Please answer all the
+          questions. Choose the option that best describes your child's
           typical behaviour. These may be associated with dyslexia or other
-          learning difficulties, if they are unexpected for the child’s age,
+          learning difficulties, if they are unexpected for the child's age,
           educational level, or cognitive abilities. If many of these are
-          observed frequently and the child’s score is high , we request you to
+          observed frequently and the child's score is high, we request you to
           seek the support of a counsellor.
-           <br />
+          <br />
           <br />
           <b>We request you to read about the unique strengths of children with learning challenges.</b>
         </p>
       </div>
 
-      <div className="questions-grid">
+      <div className="questions-compact-grid">
         {questions.map((question, index) => (
           <div
             key={index}
-            className="question-row"
+            className="question-compact-row"
             ref={(el) => (questionRefs.current[index] = el)}
             tabIndex={-1}
           >
-            <div className="question-text">
-              <span className="question-number">{index + 1}.</span>
-              {typeof question === "string"
-                ? question
-                : question.text || question.question}
-            </div>
-            <div className="options-group">
-              {options.map((option, optionIndex) => (
-                <label key={optionIndex} className="radio-option">
-                  <input
-                    type="radio"
-                    name={`question-${index}`}
-                    value={optionIndex}
-                    checked={formData.answers[index] === optionIndex}
-                    onChange={() => updateAnswer(index, optionIndex)}
-                  />
-                  <span className="radio-text">{option}</span>
-                </label>
-              ))}
+            <div className="question-compact-content">
+              <div className="question-compact-text">
+                <span className="question-compact-number">{index + 1}.</span>
+                <span className="question-compact-title">
+                  {typeof question === "string"
+                    ? question
+                    : question.text || question.question}
+                </span>
+              </div>
+              <div className="options-compact-group">
+                {options.map((option, optionIndex) => (
+                  <label key={optionIndex} className="radio-compact-option">
+                    <input
+                      type="radio"
+                      name={`question-${index}`}
+                      value={optionIndex}
+                      checked={formData.answers[index] === optionIndex}
+                      onChange={() => updateAnswer(index, optionIndex)}
+                    />
+                    <span className="radio-compact-text">{option}</span>
+                  </label>
+                ))}
+              </div>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="navigation-buttons">
+      <div className="navigation-buttons" style={{ textAlign: 'center', marginTop: '2rem' }}>
         {!formData.result && !loading ? (
           <button
             className="btn btn-primary btn-large"
             onClick={(event) => handleSubmit(event)}
             disabled={loading}
           >
-            View Results
+            Submit
           </button>
         ) : loading ? (
           <div className="loading-container">
@@ -529,18 +502,32 @@ const QuestionnairePage = ({
             <p className="loading-text-primary">Waiting for results...</p>
             <p className="loading-text-secondary">Please wait while we analyze your responses</p>
           </div>
+        ) : null}
+      </div>
+
+      {/* Disclaimer Section - Show before and after results with dynamic content */}
+      <div className="disclaimer-section">
+        {!formData.result ? (
+          <>
+            <p className="disclaimer-text">
+              This checklist is intended as a starting point and if your answer is <strong>very often</strong> to most of the questions you may want to seek professional guidance. It is important to note that this is not a formal assessment or diagnosis. Contact us for more information.
+            </p>
+            <button className="contact-button">
+              Contact Us
+            </button>
+          </>
         ) : (
-          // Results displayed right where the button was
-          <div className="results-container">
-            <div className={`results-card ${formData.result.action === "ok" ? "success" : "warning"}`}>
-              <p className={`results-text ${formData.result.action === "ok" ? "success" : "warning"}`}>
-                {formData.result.action === "ok" 
-                  ? "Based on your responses, your child is not at risk. If you have any questions, please contact us."
-                  : "Based on your responses, your child's score is above normal. We recommend that you seek professional guidance. If you have any questions, please contact us."
-                }
-              </p>
-            </div>
-          </div>
+          <>
+            <p className="disclaimer-text">
+              {formData.result.action === "ok" 
+                ? "Based on your responses, your child is not at risk. If you have any questions, please contact us."
+                : "Based on your responses, your child's score is above normal. We recommend that you seek professional guidance. If you have any questions, please contact us."
+              }
+            </p>
+            <button className="contact-button">
+              Contact Us
+            </button>
+          </>
         )}
       </div>
 
@@ -548,59 +535,6 @@ const QuestionnairePage = ({
       {formData.result && (
         <div className="additional-results-section">
           <div className="results-grid">
-            {/* Contact Section */}
-            <div className="info-card">
-              <h3>Contact Us</h3>
-              <p>Want to discuss these results with our specialists?</p>
-              <div className="contact-info">
-                <div className="contact-item">
-                  <span className="contact-label">Email:</span>
-                  <span>info@giftolexia.com</span>
-                </div>
-                <div className="contact-item">
-                  <span className="contact-label">Phone:</span>
-                  <span>91 7406722955</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Next Steps Section */}
-            <div className="info-card">
-              <h3>Next Steps</h3>
-              <div className="next-steps">
-                {formData.result.action === "ok" ? (
-                  <div>
-                    <div className="next-step-item">
-                      <span className="next-step-bullet">•</span>
-                      Continue monitoring your child's development
-                    </div>
-                    <div className="next-step-item">
-                      <span className="next-step-bullet">•</span>
-                      Maintain regular check-ups with your pediatrician
-                    </div>
-                    <div className="next-step-item">
-                      <span className="next-step-bullet">•</span>
-                      Encourage reading and learning activities
-                    </div>
-                  </div>
-                ) : (
-                  <div>
-                    <div className="next-step-item">
-                      <span className="next-step-bullet">•</span>
-                      Consider consulting with a developmental specialist
-                    </div>
-                    <div className="next-step-item">
-                      <span className="next-step-bullet">•</span>
-                      Discuss results with your child's pediatrician
-                    </div>
-                    <div className="next-step-item">
-                      <span className="next-step-bullet">•</span>
-                      Keep track of your child's progress
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
         </div>
       )}
